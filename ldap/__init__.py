@@ -54,8 +54,8 @@ def main():
         exit(1)
 
     if args.command == 'server':
-        from ldap.server import serve
-        serve(host=args.host, port=args.port)
+        from ldap.server import Server
+        Server(host=args.host, port=args.port).run()
 
 
 if __name__ == '__main__':
