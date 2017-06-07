@@ -110,13 +110,29 @@ def respond(messages):
         ]
 
     elif op['searchRequest']:
+        sr = op['searchRequest']
+        em = sr['filter']['equalityMatch']
+        if em:
+            assert em['attributeDesc'] and em['assertionValue']
+            key = em['attributeDesc']._value.decode()
+            val = em['assertionValue']._value.decode()
+            if key in ['uid', 'sAMAccountName']:
+                uid = val
+                email = uid + '@example.com'
+            elif key == 'mail':
+                email = val
+                uid = email.split('@')[0]
+            else:
+                raise NotImplementedError((key, val))
+        else:
+            uid = email = ''
         return [
             respond_search_entry(
                 message_id=mi,
-                name='admin',
-                attributes={'mail': 'admin@example.com',
-                            'givenName': 'admin',
-                            'sn': 'admin',
+                name=uid,
+                attributes={'mail': email,
+                            'givenName': uid.capitalize(),
+                            'sn': uid.capitalize() + 'son',
                             'subschemaSubentry': ''}),  # for ldap3
             respond_search_done(message_id=mi),
         ]
